@@ -15,8 +15,10 @@ First things first. You must know your target! Here are some tools to gather inf
 ```
 # Do this in Kali Linux :)
 git clone https://github.com/guelfoweb/knock.git
-cd knock/knockpy
-
+cd knock
+sudo python setup.py install
+knockpy -h
+knockpy rotati.com
 ```
 
 ## Discover exploits
