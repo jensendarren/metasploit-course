@@ -173,6 +173,13 @@ Let's confirm that the SQL that we inject after the password *is* being evaluate
 
 Essentially we now have (via the password field): `123456' CODE HERE #` (replace 'CODE HERE' with your hack).
 
+## SQL Injection: by-pass login
+
+The Mutillidae is very vulnerable. It's very easy to login *without* needing to provide a password. How?
+
+The username field is injectable. We can test for this in the same way as mentioned above, by entering a single quote '
+
+So if the username is vulnerable *and* we know that the generated SQL statement is `SELECT * FROM accounts WHERE username='$USERNAME' AND password='$PASSWORD` then we can inject something like `admin' #` in the username field and leave the password field empty then the resulting SQL statement will be `SELECT * FROM accounts WHERE username='admin' #' AND password=''` which will log you in as an admin user! Easy!
 
 
 
