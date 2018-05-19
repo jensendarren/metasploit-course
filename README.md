@@ -157,19 +157,19 @@ Quick note: if you set the DVWA security level to medium the above will not work
 
 ## SQL Injection
 
-Firstly, login as a root user to the metasplotable mysql sever. This is done using the following command (this is not a hack, however, the mysql root account is not password protected on the metasplotable machine!): `mysql -u root -h 10.0.2.4`
+Note if you want to see the database on metasplotable server (without hacking) just run: `mysql -u root -h 10.0.2.4`
 
 In Kali, open the Mutillidae application. Register an account and then login to check it works.
 
-Now logout and let's check the loging for to see if it is vulnerable! Enter your registered username first and in the password field just put a single quote ' and see what happens! What we see is a very informative error including the exact SQL that is executed. `SELECT * FROM accounts WHERE username='darren' AND password='''`
+Now logout and let's check the login form to see if it is vulnerable! Enter your registered username first and in the password field just put a single quote ' and see what happens! What we see is a very informative error including the exact SQL that is executed. `SELECT * FROM accounts WHERE username='darren' AND password='''`
 
-Now lets change the password to this (assume the real password is 123456): `123456' and 1=1#`
+Now lets change the value submitted in the  password field to this (assume the real password is 123456): `123456' and 1=1#`
 
 The single quote after the password essentially closes the password quote in the servers SQL statement. We can then append a 1=1 statement (which is true) and followed by a comment # to basically hide the trailing single quote that will be placed there by the server side SQL statement.
 
 What we should see is that we are still able to login. This is because we are firstly passing the correct password but also passing a 'true' sql statement (`1=1`) that is also evaluated. 
 
-Let's confirm that the SQL that we inject after the password *is* being evaluated by passing a false statement which should cause the login request to fail, like so: `123456' and 1=2#`
+Let's confirm that the SQL that we inject after the password *is* being evaluated by passing a false statement which should cause the login request to fail, like so: `123456' and 1=2#`. Indeed we will see that it fails!
 
 
 
