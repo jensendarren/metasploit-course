@@ -169,7 +169,9 @@ The single quote after the password essentially closes the password quote in the
 
 What we should see is that we are still able to login. This is because we are firstly passing the correct password but also passing a 'true' sql statement (`1=1`) that is also evaluated. 
 
-Let's confirm that the SQL that we inject after the password *is* being evaluated by passing a false statement which should cause the login request to fail, like so: `123456' and 1=2#`. Indeed we will see that it fails!
+Let's confirm that the SQL that we inject after the password *is* being evaluated by passing a false statement which should cause the login request to fail, like so: `123456' and 1=2#`. Indeed we will see that it fails (meaning we are in business to inject some SQL code to the target sever!).
+
+Essentially we now have (via the password field): `123456' CODE HERE #` (replace 'CODE HERE' with your hack).
 
 
 
